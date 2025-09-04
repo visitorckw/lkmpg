@@ -8,7 +8,7 @@
 #include <stdlib.h> /* for exit */
 #include <unistd.h> /* for read */
 
-#define MAX_BYTES 1024 * 4
+#define MAX_BYTES (1024 * 4)
 
 int main(int argc, char *argv[])
 {
