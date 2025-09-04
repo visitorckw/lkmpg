@@ -90,7 +90,7 @@ static void __exit chardev_exit(void)
  */
 static int device_open(struct inode *inode, struct file *file)
 {
-	static int counter = 0;
+	static int counter;
 
 	if (atomic_cmpxchg(&already_open, CDEV_NOT_USED, CDEV_EXCLUSIVE_OPEN))
 		return -EBUSY;
