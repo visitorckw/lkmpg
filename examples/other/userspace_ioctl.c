@@ -6,7 +6,8 @@
  */
 
 /* device specifics, such as ioctl numbers and the
- * major device file. */
+ * major device file.
+ */
 #include "../chardev.h"
 
 #include <stdio.h> /* standard I/O */
@@ -36,12 +37,12 @@ int ioctl_get_msg(int file_desc)
 	char message[100] = { 0 };
 
 	/* Warning - this is dangerous because we don't tell
-   * the kernel how far it's allowed to write, so it
-   * might overflow the buffer. In a real production
-   * program, we would have used two ioctls - one to tell
-   * the kernel the buffer length and another to give
-   * it the buffer to fill
-   */
+	 * the kernel how far it's allowed to write, so it
+	 * might overflow the buffer. In a real production
+	 * program, we would have used two ioctls - one to tell
+	 * the kernel the buffer length and another to give
+	 * it the buffer to fill
+	 */
 	ret_val = ioctl(file_desc, IOCTL_GET_MSG, message);
 
 	if (ret_val < 0) {
