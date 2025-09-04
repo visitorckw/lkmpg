@@ -193,6 +193,7 @@ static void __exit bottomhalf_exit(void)
 	gpio_set_value(leds[0].gpio, 0);
 #else
 	int i;
+
 	for (i = 0; i < ARRAY_SIZE(leds); i++)
 		gpio_set_value(leds[i].gpio, 0);
 #endif
