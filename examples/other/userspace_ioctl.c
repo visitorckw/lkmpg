@@ -2,10 +2,10 @@
 /*  userspace_ioctl.c - the process to use ioctl's to control the kernel module
  *
  *  Until now we could have used cat for input and output.  But now
- *  we need to do ioctl's, which require writing our own process. 
+ *  we need to do ioctl's, which require writing our own process.
  */
 
-/* device specifics, such as ioctl numbers and the 
+/* device specifics, such as ioctl numbers and the
  * major device file. */
 #include "../chardev.h"
 
@@ -35,11 +35,11 @@ int ioctl_get_msg(int file_desc)
     int ret_val;
     char message[100] = { 0 };
 
-    /* Warning - this is dangerous because we don't tell 
-   * the kernel how far it's allowed to write, so it 
-   * might overflow the buffer. In a real production 
+    /* Warning - this is dangerous because we don't tell
+   * the kernel how far it's allowed to write, so it
+   * might overflow the buffer. In a real production
    * program, we would have used two ioctls - one to tell
-   * the kernel the buffer length and another to give 
+   * the kernel the buffer length and another to give
    * it the buffer to fill
    */
     ret_val = ioctl(file_desc, IOCTL_GET_MSG, message);
