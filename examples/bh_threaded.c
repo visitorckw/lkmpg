@@ -30,181 +30,181 @@ static struct gpio leds[] = { { 4, GPIOF_OUT_INIT_LOW, "LED 1" } };
  * FIXME: Change the numbers for the GPIO on your board.
  */
 static struct gpio buttons[] = {
-    { 17, GPIOF_IN, "LED 1 ON BUTTON" },
-    { 18, GPIOF_IN, "LED 1 OFF BUTTON" },
+	{ 17, GPIOF_IN, "LED 1 ON BUTTON" },
+	{ 18, GPIOF_IN, "LED 1 OFF BUTTON" },
 };
 
 /* This happens immediately, when the IRQ is triggered */
 static irqreturn_t button_top_half(int irq, void *ident)
 {
-    return IRQ_WAKE_THREAD;
+	return IRQ_WAKE_THREAD;
 }
 
 /* This can happen at leisure, freeing up IRQs for other high priority task */
 static irqreturn_t button_bottom_half(int irq, void *ident)
 {
-    pr_info("Bottom half task starts\n");
-    mdelay(500); /* do something which takes a while */
-    pr_info("Bottom half task ends\n");
-    return IRQ_HANDLED;
+	pr_info("Bottom half task starts\n");
+	mdelay(500); /* do something which takes a while */
+	pr_info("Bottom half task ends\n");
+	return IRQ_HANDLED;
 }
 
 static int __init bottomhalf_init(void)
 {
-    int ret = 0;
+	int ret = 0;
 
-    pr_info("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
 /* register LED gpios */
 #ifdef NO_GPIO_REQUEST_ARRAY
-    ret = gpio_request(leds[0].gpio, leds[0].label);
+	ret = gpio_request(leds[0].gpio, leds[0].label);
 #else
-    ret = gpio_request_array(leds, ARRAY_SIZE(leds));
+	ret = gpio_request_array(leds, ARRAY_SIZE(leds));
 #endif
 
-    if (ret) {
-        pr_err("Unable to request GPIOs for LEDs: %d\n", ret);
-        return ret;
-    }
+	if (ret) {
+		pr_err("Unable to request GPIOs for LEDs: %d\n", ret);
+		return ret;
+	}
 
 /* register BUTTON gpios */
 #ifdef NO_GPIO_REQUEST_ARRAY
-    ret = gpio_request(buttons[0].gpio, buttons[0].label);
+	ret = gpio_request(buttons[0].gpio, buttons[0].label);
 
-    if (ret) {
-        pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
-        goto fail1;
-    }
+	if (ret) {
+		pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
+		goto fail1;
+	}
 
-    ret = gpio_request(buttons[1].gpio, buttons[1].label);
+	ret = gpio_request(buttons[1].gpio, buttons[1].label);
 
-    if (ret) {
-        pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
-        goto fail2;
-    }
+	if (ret) {
+		pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
+		goto fail2;
+	}
 #else
-    ret = gpio_request_array(buttons, ARRAY_SIZE(buttons));
+	ret = gpio_request_array(buttons, ARRAY_SIZE(buttons));
 
-    if (ret) {
-        pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
-        goto fail1;
-    }
+	if (ret) {
+		pr_err("Unable to request GPIOs for BUTTONs: %d\n", ret);
+		goto fail1;
+	}
 #endif
 
-    pr_info("Current button1 value: %d\n", gpio_get_value(buttons[0].gpio));
+	pr_info("Current button1 value: %d\n", gpio_get_value(buttons[0].gpio));
 
-    ret = gpio_to_irq(buttons[0].gpio);
+	ret = gpio_to_irq(buttons[0].gpio);
 
-    if (ret < 0) {
-        pr_err("Unable to request IRQ: %d\n", ret);
+	if (ret < 0) {
+		pr_err("Unable to request IRQ: %d\n", ret);
 #ifdef NO_GPIO_REQUEST_ARRAY
-        goto fail3;
+		goto fail3;
 #else
-        goto fail2;
+		goto fail2;
 #endif
-    }
+	}
 
-    button_irqs[0] = ret;
+	button_irqs[0] = ret;
 
-    pr_info("Successfully requested BUTTON1 IRQ # %d\n", button_irqs[0]);
+	pr_info("Successfully requested BUTTON1 IRQ # %d\n", button_irqs[0]);
 
-    ret = request_threaded_irq(button_irqs[0], button_top_half,
-                               button_bottom_half,
-                               IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
-                               "gpiomod#button1", &buttons[0]);
+	ret = request_threaded_irq(button_irqs[0], button_top_half,
+							   button_bottom_half,
+							   IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
+							   "gpiomod#button1", &buttons[0]);
 
-    if (ret) {
-        pr_err("Unable to request IRQ: %d\n", ret);
+	if (ret) {
+		pr_err("Unable to request IRQ: %d\n", ret);
 #ifdef NO_GPIO_REQUEST_ARRAY
-        goto fail3;
+		goto fail3;
 #else
-        goto fail2;
+		goto fail2;
 #endif
-    }
+	}
 
-    ret = gpio_to_irq(buttons[1].gpio);
+	ret = gpio_to_irq(buttons[1].gpio);
 
-    if (ret < 0) {
-        pr_err("Unable to request IRQ: %d\n", ret);
+	if (ret < 0) {
+		pr_err("Unable to request IRQ: %d\n", ret);
 #ifdef NO_GPIO_REQUEST_ARRAY
-        goto fail3;
+		goto fail3;
 #else
-        goto fail2;
+		goto fail2;
 #endif
-    }
+	}
 
-    button_irqs[1] = ret;
+	button_irqs[1] = ret;
 
-    pr_info("Successfully requested BUTTON2 IRQ # %d\n", button_irqs[1]);
+	pr_info("Successfully requested BUTTON2 IRQ # %d\n", button_irqs[1]);
 
-    ret = request_threaded_irq(button_irqs[1], button_top_half,
-                               button_bottom_half,
-                               IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
-                               "gpiomod#button2", &buttons[1]);
+	ret = request_threaded_irq(button_irqs[1], button_top_half,
+							   button_bottom_half,
+							   IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
+							   "gpiomod#button2", &buttons[1]);
 
-    if (ret) {
-        pr_err("Unable to request IRQ: %d\n", ret);
+	if (ret) {
+		pr_err("Unable to request IRQ: %d\n", ret);
 #ifdef NO_GPIO_REQUEST_ARRAY
-        goto fail4;
+		goto fail4;
 #else
-        goto fail3;
+		goto fail3;
 #endif
-    }
+	}
 
-    return 0;
+	return 0;
 
 /* cleanup what has been setup so far */
 #ifdef NO_GPIO_REQUEST_ARRAY
 fail4:
-    free_irq(button_irqs[0], &buttons[0]);
+	free_irq(button_irqs[0], &buttons[0]);
 
 fail3:
-    gpio_free(buttons[1].gpio);
+	gpio_free(buttons[1].gpio);
 
 fail2:
-    gpio_free(buttons[0].gpio);
+	gpio_free(buttons[0].gpio);
 
 fail1:
-    gpio_free(leds[0].gpio);
+	gpio_free(leds[0].gpio);
 #else
 fail3:
-    free_irq(button_irqs[0], &buttons[0]);
+	free_irq(button_irqs[0], &buttons[0]);
 
 fail2:
-    gpio_free_array(buttons, ARRAY_SIZE(buttons));
+	gpio_free_array(buttons, ARRAY_SIZE(buttons));
 
 fail1:
-    gpio_free_array(leds, ARRAY_SIZE(leds));
+	gpio_free_array(leds, ARRAY_SIZE(leds));
 #endif
 
-    return ret;
+	return ret;
 }
 
 static void __exit bottomhalf_exit(void)
 {
-    pr_info("%s\n", __func__);
+	pr_info("%s\n", __func__);
 
-    /* free irqs */
-    free_irq(button_irqs[0], &buttons[0]);
-    free_irq(button_irqs[1], &buttons[1]);
+	/* free irqs */
+	free_irq(button_irqs[0], &buttons[0]);
+	free_irq(button_irqs[1], &buttons[1]);
 
 /* turn all LEDs off */
 #ifdef NO_GPIO_REQUEST_ARRAY
-    gpio_set_value(leds[0].gpio, 0);
+	gpio_set_value(leds[0].gpio, 0);
 #else
-    int i;
-    for (i = 0; i < ARRAY_SIZE(leds); i++)
-        gpio_set_value(leds[i].gpio, 0);
+	int i;
+	for (i = 0; i < ARRAY_SIZE(leds); i++)
+		gpio_set_value(leds[i].gpio, 0);
 #endif
 
 /* unregister */
 #ifdef NO_GPIO_REQUEST_ARRAY
-    gpio_free(leds[0].gpio);
-    gpio_free(buttons[0].gpio);
-    gpio_free(buttons[1].gpio);
+	gpio_free(leds[0].gpio);
+	gpio_free(buttons[0].gpio);
+	gpio_free(buttons[1].gpio);
 #else
-    gpio_free_array(leds, ARRAY_SIZE(leds));
-    gpio_free_array(buttons, ARRAY_SIZE(buttons));
+	gpio_free_array(leds, ARRAY_SIZE(leds));
+	gpio_free_array(buttons, ARRAY_SIZE(buttons));
 #endif
 }
 
