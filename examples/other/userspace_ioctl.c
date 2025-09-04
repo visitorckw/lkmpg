@@ -24,9 +24,8 @@ int ioctl_set_msg(int file_desc, char *message)
 
 	ret_val = ioctl(file_desc, IOCTL_SET_MSG, message);
 
-	if (ret_val < 0) {
+	if (ret_val < 0)
 		printf("ioctl_set_msg failed:%d\n", ret_val);
-	}
 
 	return ret_val;
 }
@@ -45,9 +44,9 @@ int ioctl_get_msg(int file_desc)
 	 */
 	ret_val = ioctl(file_desc, IOCTL_GET_MSG, message);
 
-	if (ret_val < 0) {
+	if (ret_val < 0)
 		printf("ioctl_get_msg failed:%d\n", ret_val);
-	}
+
 	printf("get_msg message:%s", message);
 
 	return ret_val;
